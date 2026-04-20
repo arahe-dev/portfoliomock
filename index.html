@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<title>Pocket Dev — Alex Chen Portfolio</title>
+<title>Pocket Dev — Abdur Raheem Imami</title>
 <meta name="viewport" content="width=device-width,initial-scale=1" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
   :root{
     --shell:#C8C8B4;
@@ -20,7 +21,7 @@
     --page:#0d0d1a;
   }
   *{box-sizing:border-box}
-  html,body{margin:0;padding:0;background:var(--page);color:#fff;min-height:100%;font-family:-apple-system,Helvetica,Arial,sans-serif}
+  html,body{margin:0;padding:0;background:var(--page);color:#fff;min-height:100%;font-family:-apple-system,Helvetica,Arial,sans-serif;overflow-x:hidden}
   body{
     display:flex;align-items:center;justify-content:center;min-height:100vh;
     background:
@@ -329,7 +330,7 @@
     <div class="battery"><span class="cell"></span><span class="cell"></span></div>
 
     <div class="brand">
-      <div class="left">Pixelstack<sup style="font-size:10px;vertical-align:super;margin-left:2px;opacity:0.7">®</sup></div>
+      <div class="left" style="opacity:0;pointer-events:none;">·</div>
       <div class="right">
         <span class="dot"></span><span class="line"></span>
         <span>POCKET&nbsp;DEV</span><span class="tm">TM</span>
@@ -339,7 +340,7 @@
     <div class="screen-module">
       <div class="screen-toprow">
         <div class="led"></div>
-        <div>DOT MATRIX · ALEX CHEN ED.</div>
+        <div>DOT MATRIX</div>
         <div style="opacity:0">●</div>
       </div>
       <div class="lcd-wrap" id="lcdwrap">
@@ -519,19 +520,24 @@ const state = {
   inGame:false, gamePaused:false,
   palette: prefs.palette,
   statsAnim:0,
+  pdScrollY:0,
 };
 
 const PROJECTS = [
-  {name:"PIXELFORGE", sub:"pixel art editor", stack:"React + Canvas", year:"2024",
-   desc:["> 64-LAYER SPRITE EDITOR","> EXPORTS GIF + SHEETS"]},
-  {name:"RUSTBOARD", sub:"Kanban CLI", stack:"Rust", year:"2023",
-   desc:["> TERMINAL KANBAN","> GIT-STYLE SYNC"]},
-  {name:"NEURALENS", sub:"ML image filter", stack:"Python + TFLite", year:"2023",
-   desc:["> ON-DEVICE FILTERS","> 12 MODELS / 8MB"]},
-  {name:"LOOPCAST", sub:"podcast manager", stack:"Electron", year:"2022",
-   desc:["> OPML + OFFLINE SYNC","> CHAPTER PLAYBACK"]},
+  {name:"BREAD v2", sub:"From-scratch CUDA MoE Inference", stack:"CUDA · C++ · GGUF", year:"2026",
+   desc:["> Port danveloper's flash-moe (macOS/Metal only) to Windows/CUDA","> Target: Qwen3.5-35B-A3B (35B params MoE) on RTX 4060 (8GB VRAM)","> 3-tier weight streaming: VRAM→pinned RAM→NVMe SSD with async prefetch","> 18-slot LRU expert cache, custom GGUF parser, Q4_K/Q6_K dequant (verified vs. ggml-quants.c)","> PCIe x8 bandwidth profiling: ~8-12 GB/s practical, NVMe optimal K=4 parallel reads"]},
+  {name:"MOE KV ROUTING", sub:"Sparse Attention Dashboard (262K tokens)", stack:"React · WebSocket · Node.js", year:"2026",
+   desc:["> Extends BREAD v2 with sparse KV cache routing layer","> Predict which KV blocks each attention head accesses, materialize selectively","> 8-10x KV bandwidth compression at 262k context window","> Real-time React dashboard: per-head routing decisions, recall heatmaps (predicted vs actual)","> Live bandwidth savings visualization, quality/throughput trade-off curves (K=4,8,16,32)","> Automatic fallback to dense Circular KV if accuracy drops beyond threshold"]},
+  {name:"GLOVERXR", sub:"Wearable IMU-based Hand Motion Capture", stack:"Embedded C · Java · Sensor Fusion", year:"2025",
+   desc:["> Multiple LSM6DSO32 6-DoF IMUs (accel + gyro) on each finger joint","> Custom Mahony-style sensor fusion algorithm for real-time joint angle estimation","> Kinematic chain math to propagate finger pose from wrist reference frame","> Optical-field-free & magnetic-field-free (works near robot actuators/motors unlike mocap)","> Java Processing live 3D skeletal visualization with per-joint angle display","> Joint bounds as drift correction mechanism; bio-inspired range-of-motion constraints"]},
+  {name:"ATELIER", sub:"High-Performance Terminal Browser (Rust)", stack:"Rust · Ratatui · Tokio · Chromium", year:"2026",
+   desc:["> ~361 LOC: headless Chrome captures PNG → downscale to terminal grid → Ratatui render","> Sixel graphics encoding pipeline (img2sixel) + 256-color ANSI ASCII art fallback for older terminals","> Async HTTP backend + trait-based architecture for backend swapping (simple HTTP vs headless browser)","> Alt-screen terminal handling, 100ms non-blocking event loop, YouTube detection module","> Future: mpv playback integration for video in terminal, layout preservation across render passes"]},
+  {name:"RAILWAY INSPECTION", sub:"Smart Track Monitoring (SIH 2025)", stack:"Embedded C · Custom Hardware · IoT", year:"2026",
+   desc:["> Smart India Hackathon 2025 Hardware PS 25020: eliminate need for dedicated track inspection trains","> Modular clip-on IMU units attach to operational trains for continuous monitoring","> Passive vibration detection (FFT/Welch on-device), anomaly classification for defects vs normal wear","> KAVACH RFID integration for GPS-independent geo-tagging in tunnels; 5G real-time alerting to control centers","> TM/IM/448-compliant data acquisition + Gati Shakti infrastructure mapping ready","> 70% CAPEX, 67% OPEX reduction vs traditional Track Recording Cars; nationwide deployment viable"]},
+  {name:"KP17 HUMANOID", sub:"17-DOF Bipedal Humanoid Robot", stack:"C++ · SolidWorks · RoboCup", year:"2025",
+   desc:["> Co-founded Team Genesis with 16 members; KP17 is flagship platform","> 17-DOF architecture: 6 per leg + 1 waist + 2 per arm + 2 neck (biped stability optimized)","> Pod-based distributed control: modular hardware units communicate via I2C/CAN; full onboard computation (no tethers)","> Integrated GloveXR for teleoperation + sensor feedback; IMU-based balance correction","> SolidWorks CAD design with weight optimization; RoboCup humanoid framework compliance","> Kinematics verified in simulation; hardware integration ongoing (joints, motors, power management)"]},
 ];
-const SECTIONS = ["TITLE","ABOUT","SKILLS","PROJECTS","CONTACT"];
+const SECTIONS = ["TITLE","ABOUT","EXPERIENCE","PROJECTS","SKILLS","CONTACT"];
 
 /* ==================== AUDIO ==================== */
 let audioCtx = null;
@@ -561,10 +567,10 @@ function render(){
         <div class="corner tl">◤</div><div class="corner tr">◥</div>
         <div class="corner bl">◣</div><div class="corner br">◢</div>
         <div class="hearts"><span>♥</span><span>♥</span><span>♥</span><span class="dim">♥</span></div>
-        <div class="ts-name slow-blink">ALEX CHEN</div>
-        <div class="ts-sub">◆ DEV · TECHNOLOGIST ◆</div>
+        <div class="ts-name slow-blink">ABDUR</div>
+        <div class="ts-sub">◆ MECHATRONICS & AUTOMATION ◆</div>
         <div id="avatar" style="margin:14px auto 4px"></div>
-        <div class="ts-coin">× 1UP</div>
+        <div class="ts-coin">× VIT CHENNAI</div>
         <div class="blink ts-press">▸ PRESS A TO START ◂</div>
         <div class="ts-foot">◁ ▷ CHANGE PAGE · ⚙ SETTINGS</div>
       </div>`;
@@ -577,27 +583,55 @@ function render(){
       <div class="about-grid">
         <div class="about-portrait">
           <div id="avatar2"></div>
-          <div class="portrait-tag">LV.26</div>
+          <div class="portrait-tag">RANK 4</div>
         </div>
         <div class="lcd-text about-stats">
-          <div class="k">NAME</div><div class="v">ALEX CHEN</div>
-          <div class="k">CLASS</div><div class="v">FULL-STACK</div>
-          <div class="k">LOC</div><div class="v">SF, CA</div>
-          <div class="k">EXP</div><div class="v">4 YEARS</div>
+          <div class="k">NAME</div><div class="v">ABDUR RAHEEM IMAMI</div>
+          <div class="k">STUDY</div><div class="v">MECHATRONICS &amp; AUTOMATION</div>
+          <div class="k">YEAR</div><div class="v">2/4 (SEM 4)</div>
+          <div class="k">CGPA</div><div class="v">8.82</div>
         </div>
       </div>
-      <div class="about-bio">&gt; BUILDS WEB APPS, ML TOYS,<br/>&nbsp;&nbsp;AND TINY INTERFACES<span class="cursor"></span></div>
-      <div class="chip-row">
-        <span class="chip">REACT</span><span class="chip">RUST</span><span class="chip">ML</span><span class="chip">UI</span>
+      <div class="about-bio" style="font-size:11px;margin-top:6px;">◆ VIT CHENNAI (2024–2028)<br/>B.Tech Mechatronics &<br/>Automation Eng (Year 2)<br/>CGPA 8.82 | Rank 4<br/>Sem 1 GPA: 9.56<br/><br/>&gt; CUDA INFERENCE ENGINES<br/>&gt; HUMANOID ROBOTICS<br/>&gt; EMBEDDED FIRMWARE &<br/>&gt; SENSOR FUSION SYSTEMS<br/><span class="cursor"></span></div>
+      <div class="chip-row" style="margin-top:6px;">
+        <span class="chip">CUDA</span><span class="chip">RUST</span><span class="chip">ROBOTICS</span><span class="chip">EMBEDDED</span><span class="chip">C++</span>
+      </div>
+      <div class="resume-box" id="resumeBox" style="cursor:pointer;margin-top:8px;">
+        <div class="rb-label">▼ RESUME</div>
+        <div class="rb-press blink">[A] DOWNLOAD</div>
       </div>`;
     drawAvatar(document.getElementById("avatar2"), false, 4);
+    document.getElementById("resumeBox").addEventListener("click", downloadResumePDF);
     return;
   }
   if(state.section===2){
-    const stats = [["REACT",82],["RUST",61],["PYTHON",88],["CSS/UI",79],["ML/AI",70]];
+    s.innerHTML = `<div class="section-title">◆ EXPERIENCE ${pg}</div>
+      <div class="exp-list" id="expList"></div>`;
+    const exps = [
+      {title:"Co-Founder & CTO", org:"Sentrix Robotics", dates:"2025–Now", details:["V-NEST Incubated (26th startup)","DPIIT Recognized startup","Own complete tech roadmap","Represented at Google AI Day 2025"]},
+      {title:"Co-Founder & Head of Operations", org:"Team Genesis (16th STT)", dates:"2025–Now", details:["VIT's humanoid robotics team","Directing KP17 development","GloveXR teleoperation program","Market-Based Mgmt model"]},
+      {title:"Management Member", org:"IEEE CompSoc VIT", dates:"Jul 2025–Now", details:["Event planning & initiatives","BuildersHut hackathon org","Community tech programming"]}
+    ];
+    const el = document.getElementById("expList");
+    exps.forEach((e,i)=>{
+      const row = document.createElement("div");
+      row.style.cssText = "margin-bottom:12px;padding:6px;border-left:2px solid var(--lcd-3);padding-left:8px;";
+      row.innerHTML = `<div style="font-weight:700;color:var(--lcd-3);font-size:12px;font-family:ui-monospace,monospace;">${e.title}</div><div style="color:var(--lcd-2);font-size:10px;font-family:ui-monospace,monospace;">${e.org} · ${e.dates}</div><div style="font-size:10px;color:var(--lcd-3);margin-top:4px;font-family:ui-monospace,monospace;">${e.details.map(d=>"• "+d).join("<br/>")}</div>`;
+      el.appendChild(row);
+    });
+    return;
+  }
+  if(state.section===4){
+    const stats = [["CUDA",92],["C/C++",88],["RUST",85],["PYTHON",90],["ROBOTICS",88],["EMBEDDED",86]];
     s.innerHTML = `<div class="section-title">◆ SKILLS ${pg}</div>
       <div class="stats-wrap" id="stats"></div>
-      <div class="skill-foot">▲ TOTAL LVL ${stats.reduce((a,[,v])=>a+v,0)} / ${stats.length*100}</div>`;
+      <div class="skill-foot">▲ TOTAL LVL ${stats.reduce((a,[,v])=>a+v,0)} / ${stats.length*100}</div>
+      <div style="margin-top:12px;font-size:10px;color:var(--lcd-2);line-height:1.4;">
+        <div><strong>SYSTEMS:</strong> CUDA • MoE Arch • GPU Prog • Quantization • Tiered Memory</div>
+        <div style="margin-top:4px;"><strong>HARDWARE:</strong> ESP32 • IMU/Sensor Fusion • SolidWorks • Embedded C</div>
+        <div style="margin-top:4px;"><strong>ROBOTICS:</strong> Humanoid • Bipedal • Teleoperation • Kinematic Chains</div>
+        <div style="margin-top:4px;"><strong>TOOLS:</strong> Git • CMake • Windows</div>
+      </div>`;
     const sb = document.getElementById("stats");
     stats.forEach(([n,v])=>{
       let bars="";
@@ -618,17 +652,112 @@ function render(){
   if(state.section===3){
     if(state.projectDetail>=0){
       const p = PROJECTS[state.projectDetail];
+      const details = [
+        {name:"BREAD v2", full:`<div style="color:var(--lcd-2);margin-bottom:6px;">◆ WHAT IT IS</div>
+A from-scratch CUDA inference engine for Mixture-of-Experts transformer models on Windows — porting danveloper's flash-moe (C/Metal, macOS-only) to CUDA with full Windows support. Target model: Qwen3.5-35B-A3B, a 35-billion-parameter sparse MoE, running coherently on a consumer RTX 4060 with only 8GB VRAM.
+
+<div style="color:var(--lcd-2);margin:8px 0 4px;">◆ WEIGHT STREAMING PIPELINE</div>
+Engineered a 3-tier weight hierarchy: active expert weights live in VRAM → evicted to pinned host RAM → cold weights on NVMe SSD. An 18-slot LRU expert cache decides eviction policy. Async cudaMemcpyAsync prefetching pipelines the next expert load behind the current forward pass to hide transfer latency.
+
+<div style="color:var(--lcd-2);margin:8px 0 4px;">◆ QUANTIZATION & PARSING</div>
+Custom GGUF file parser (no llama.cpp dependency). CPU-side dequantization for Q4_K and Q6_K formats; output verified byte-identical vs. ggml-quants.c reference. CUDA kernels handle expert dispatch and matmul on dequantized weights.
+
+<div style="color:var(--lcd-2);margin:8px 0 4px;">◆ BANDWIDTH ANALYSIS</div>
+Profiled PCIe x8 practical ceiling: ~8–12 GB/s sustained. NVMe parallel read experiments showed K=4 concurrent workers optimal before diminishing returns. Concluded runtime expert pre-prediction has higher scheduling impact than blob format optimizations.
+
+<div style="color:var(--lcd-2);margin:8px 0 4px;">◆ STATUS</div>
+Inference loop running end-to-end. Currently debugging an embedding read mismatch that produces incoherent token output — byte-level comparison against reference shows divergence in the embedding lookup stage. First from-scratch CUDA MoE engine targeting Windows consumer hardware.`},
+
+        {name:"MOE KV ROUTING", full:`<div style="color:var(--lcd-2);margin-bottom:6px;">◆ WHAT IT IS</div>
+An extension to BREAD v2 that adds a sparse KV cache routing layer — instead of materializing the full KV cache for 262k tokens, it predicts which KV blocks each attention head will actually access and selectively loads only those blocks from SSD → RAM → VRAM. Target: 8–10x KV bandwidth compression at 262k context length.
+
+<div style="color:var(--lcd-2);margin:8px 0 4px;">◆ THE ROUTING PROBLEM</div>
+At 262k tokens, a dense KV cache for a large model is enormous — far beyond VRAM capacity. Sparse attention patterns mean most heads only attend to a small fraction of past tokens. The router learns which KV blocks are relevant per head per layer and pre-fetches only those, discarding the rest.
+
+<div style="color:var(--lcd-2);margin:8px 0 4px;">◆ DASHBOARD</div>
+Real-time React + WebSocket visualization dashboard exposing: per-head routing decisions (which blocks were fetched), routing recall heatmaps (predicted blocks vs. actual attention mass post-softmax), live bandwidth savings graph (dense vs. routed MB/s), and quality/throughput trade-off curves across K values (K=4, 8, 16, 32 blocks per head).
+
+<div style="color:var(--lcd-2);margin:8px 0 4px;">◆ VALIDATION & FALLBACK</div>
+Dashboard is the primary validation instrument — recall visible in-flight means router misprediction is caught immediately. Automatic fallback to dense Circular KV if recall drops below accuracy threshold, ensuring output quality never degrades silently.
+
+<div style="color:var(--lcd-2);margin:8px 0 4px;">◆ SIGNIFICANCE</div>
+First-of-its-kind real-time visualization for MoE sparse KV routing during live inference. Node.js telemetry backend hooks directly into the CUDA loop.`},
+
+        {name:"GLOVERXR", full:`<div style="color:var(--lcd-2);margin-bottom:6px;">◆ WHAT IT IS</div>
+A wearable hand motion capture system using multiple LSM6DSO32 6-DoF IMUs (3-axis accelerometer + 3-axis gyroscope) mounted on each finger joint. Entirely optical-field-free and magnetic-field-free — unlike conventional mocap systems (OptiTrack, Vive Trackers), it functions in any environment including near robot actuators and motors where magnetic fields cause conventional tracking to fail.
+
+<div style="color:var(--lcd-2);margin:8px 0 4px;">◆ SENSOR FUSION</div>
+Custom Mahony-style attitude estimation filter fuses accelerometer and gyroscope data per IMU into a quaternion orientation. Kinematic chain mathematics propagate each finger segment's pose relative to the wrist reference frame, producing per-finger joint angles in real time with low drift.
+
+<div style="color:var(--lcd-2);margin:8px 0 4px;">◆ DRIFT CORRECTION</div>
+Joint angle bounds act as a passive drift correction mechanism — anatomically impossible poses are rejected and corrected, preventing accumulated gyroscope integration error from diverging. Bio-inspired range-of-motion constraints modeled on human hand anatomy.
+
+<div style="color:var(--lcd-2);margin:8px 0 4px;">◆ VISUALIZATION</div>
+Java Processing renders a live 3D skeletal hand model with per-joint angle feedback display. Used for development verification and teleoperation operator training.
+
+<div style="color:var(--lcd-2);margin:8px 0 4px;">◆ APPLICATION</div>
+Primary use case: teleoperation input device for the KP17 humanoid robot. Zero field dependencies unlock use in electromagnetically noisy industrial environments where magnetic mocap completely fails.`},
+
+        {name:"ATELIER", full:`<div style="color:var(--lcd-2);margin-bottom:6px;">◆ WHAT IT IS</div>
+A high-performance terminal browser written in ~361 lines of Rust. The core idea: instead of re-implementing a browser engine in the terminal, use headless Chrome to do all the real rendering (full CSS, JavaScript, layout) and only handle the display side in Rust.
+
+<div style="color:var(--lcd-2);margin:8px 0 4px;">◆ RENDER PIPELINE</div>
+Headless Chrome captures a full-resolution PNG of the page → downscale to terminal grid dimensions (columns × rows in character cells) → encode as sixel graphics data → Ratatui renders to the terminal TUI. The browser does the hard work; Atelier converts the output.
+
+<div style="color:var(--lcd-2);margin:8px 0 4px;">◆ GRAPHICS BACKENDS</div>
+Primary path: sixel graphics detection + img2sixel encoding for terminals with sixel support (WezTerm, mlterm, some iTerm2 builds). Fallback: 256-color ANSI ASCII art rendering for terminals without sixel — every terminal works, quality degrades gracefully.
+
+<div style="color:var(--lcd-2);margin:8px 0 4px;">◆ ARCHITECTURE</div>
+Trait-based backend design: the display layer is completely decoupled from the source — hot-swap between simple HTTP fetch backend and full headless browser backend without changing any display code. Async Tokio event loop with 100ms non-blocking poll. Alt-screen terminal handling (enter/exit cleanly).
+
+<div style="color:var(--lcd-2);margin:8px 0 4px;">◆ EXTRAS</div>
+YouTube URL detection module (regex-based) for planned future mpv playback integration — watch videos from within the terminal. Release binary: ~8MB. 2/2 unit tests passing (layout preservation, render correctness).`},
+
+        {name:"RAILWAY INSPECTION", full:`<div style="color:var(--lcd-2);margin-bottom:6px;">◆ WHAT IT IS</div>
+Smart India Hackathon 2025 (Hardware PS 25020): clip-on IMU-based monitoring units that magnetically attach to operational trains for continuous railway track and infrastructure inspection — eliminating the need for dedicated Track Recording Cars (TRCs) entirely.
+
+<div style="color:var(--lcd-2);margin:8px 0 4px;">◆ THE PROBLEM</div>
+India's railway network relies on expensive imported Track Recording Cars for periodic inspection — high CAPEX, low coverage frequency, and unable to monitor all routes continuously. Our system turns every operational train into a monitoring node.
+
+<div style="color:var(--lcd-2);margin:8px 0 4px;">◆ SENSING & DETECTION</div>
+Passive IMU-based vibration sensing — no active emission, no external infrastructure needed. On-device FFT and Welch power spectral density computation classifies detected vibrations as track defects vs. normal wear in real time, at the edge. No cloud dependency for detection.
+
+<div style="color:var(--lcd-2);margin:8px 0 4px;">◆ LOCALIZATION</div>
+KAVACH RFID integration for GPS-independent geo-tagging — critical for tunnel sections where satellite signal is unavailable. 5G real-time alerting pushes anomaly reports with location tags to control centers immediately.
+
+<div style="color:var(--lcd-2);margin:8px 0 4px;">◆ COMPLIANCE & IMPACT</div>
+TM/IM/448-compliant data acquisition. Gati Shakti national infrastructure mapping ready. Route-coverage algorithm maximizes network-wide inspection with minimum units deployed. Performance: 70% CAPEX reduction, 67% OPEX reduction vs. traditional TRCs. Representing VIT Chennai at SIH 2025 nationals.`},
+
+        {name:"KP17 HUMANOID", full:`<div style="color:var(--lcd-2);margin-bottom:6px;">◆ WHAT IT IS</div>
+KP17 is the flagship humanoid robot of Team Genesis — VIT Chennai's first dedicated humanoid robotics Special Technical Team (16th STT on campus), co-founded and grew from 0 to 16 members within 1 year. KP17 is a 17-DOF bipedal humanoid targeting RoboCup Humanoid League competition.
+
+<div style="color:var(--lcd-2);margin:8px 0 4px;">◆ DOF BREAKDOWN</div>
+17 degrees of freedom total: 6 per leg (hip roll, hip pitch, hip yaw, knee pitch, ankle pitch, ankle roll) + 1 waist pitch + 2 per arm (shoulder + elbow) + 2 neck (pan + tilt). Layout optimized for bipedal walking stability and upper-body manipulation tasks.
+
+<div style="color:var(--lcd-2);margin:8px 0 4px;">◆ CONTROL ARCHITECTURE</div>
+Pod-based distributed control: the robot is divided into functional pods (leg, arm, torso) each with a local controller communicating over I2C/CAN bus. Full onboard computation — no tethers, no external PC dependency during operation. Each pod is independently debuggable.
+
+<div style="color:var(--lcd-2);margin:8px 0 4px;">◆ TELEOPERATION</div>
+Tightly integrated with GloveXR for operator teleoperation — wrist and finger pose from the glove maps to KP17 arm/hand joints in real time. IMU-based balance correction provides haptic-equivalent feedback loop to the operator.
+
+<div style="color:var(--lcd-2);margin:8px 0 4px;">◆ HARDWARE & STATUS</div>
+Complete SolidWorks CAD with weight optimization for bipedal equilibrium. Actuators: DYNAMIXEL servo motors. Kinematics verified in PyBullet simulation. Real-world bipedal gait tuning currently in progress. Target: RoboCup Humanoid League participation.`}
+      ];
+      const detail = details[state.projectDetail];
       s.innerHTML = `<div class="section-title">◆ PROJECT ${state.projectDetail+1}/${PROJECTS.length}</div>
-        <div class="project-detail">
+        <div class="project-detail" style="display:flex;flex-direction:column;overflow:hidden;height:calc(100% - 28px);">
           <div class="pd-badge">#${String(state.projectDetail+1).padStart(2,"0")}</div>
           <div class="pd-name">${p.name}</div>
-          <div class="pd-sub">${p.sub} · ${p.year}</div>
-          <div class="pd-stack">▸ ${p.stack}</div>
-          <div class="pd-desc">
-            ${p.desc.map(d=>`<div>${d}</div>`).join("")}
+          <div class="pd-sub">${p.sub}</div>
+          <div class="pd-sub" style="color:var(--lcd-2);font-size:9px;margin-top:2px;">${p.year} · ${p.stack}</div>
+          <div class="pd-bar" style="margin-top:4px;"></div>
+          <div style="flex:1;overflow:hidden;position:relative;margin-top:4px;">
+            <div id="pd-scroll-body" style="transform:translateY(${-state.pdScrollY}px);transition:transform 80ms;">
+              <div class="pd-desc" style="font-size:10px;line-height:1.5;">${detail.full}</div>
+            </div>
           </div>
-          <div class="pd-bar"></div>
-          <div class="pd-foot">[B] BACK  ·  [A] OPEN</div>
+          <div class="pd-bar" style="margin-top:4px;"></div>
+          <div class="pd-foot">[↑↓] SCROLL  ·  [B] BACK</div>
         </div>`;
       return;
     }
@@ -644,19 +773,21 @@ function render(){
     });
     return;
   }
-  if(state.section===4){
+  if(state.section===5){
     s.innerHTML = `<div class="section-title">◆ CONTACT ${pg}</div>
       <div class="contact-list">
-        <div class="c-row"><span class="c-icon">◆</span><span class="c-label">GITHUB</span><span class="c-val">alexchendev</span></div>
-        <div class="c-row"><span class="c-icon">✉</span><span class="c-label">EMAIL</span><span class="c-val">alex@pixelstack.io</span></div>
-        <div class="c-row"><span class="c-icon">●</span><span class="c-label">SOCIAL</span><span class="c-val">@alexchendev</span></div>
-        <div class="c-row"><span class="c-icon">◈</span><span class="c-label">WEB</span><span class="c-val">alexchen.dev</span></div>
+        <div class="c-row" id="github-row" style="cursor:pointer;"><span class="c-icon">◆</span><span class="c-label">GITHUB</span><span class="c-val">arahe-dev</span></div>
+        <div class="c-row" id="linkedin-row" style="cursor:pointer;"><span class="c-icon">●</span><span class="c-label">LINKEDIN</span><span class="c-val">arahe</span></div>
+        <div class="c-row" style="cursor:default;"><span class="c-icon">◈</span><span class="c-label">COLLEGE</span><span class="c-val">VIT CHENNAI</span></div>
       </div>
-      <div class="resume-box">
-        <div class="rb-label">▼ RESUME</div>
-        <div class="rb-press blink">[A] DOWNLOAD</div>
+      <div class="resume-box" id="linkedin-btn" style="cursor:pointer;margin-top:10px;border-style:solid;">
+        <div class="rb-label">◆ GET IN TOUCH</div>
+        <div class="rb-press blink">[A] OPEN LINKEDIN</div>
       </div>
       <div class="coin-strip">◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆</div>`;
+    document.getElementById("linkedin-btn").addEventListener("click", ()=>{ window.open("https://linkedin.com/in/arahe","_blank"); beep(880,0.06,"square",0.06); });
+    document.getElementById("linkedin-row").addEventListener("click", ()=>{ window.open("https://linkedin.com/in/arahe","_blank"); beep(880,0.06,"square",0.06); });
+    document.getElementById("github-row").addEventListener("click", ()=>{ window.open("https://github.com/arahe-dev","_blank"); beep(880,0.06,"square",0.06); });
     return;
   }
 }
@@ -740,6 +871,10 @@ function move(dir){
     if(dir==="up"){ state.projectIdx=(state.projectIdx-1+PROJECTS.length)%PROJECTS.length; beep(700,0.04,"square",0.04); render(); return;}
     if(dir==="down"){ state.projectIdx=(state.projectIdx+1)%PROJECTS.length; beep(700,0.04,"square",0.04); render(); return;}
   }
+  if(state.section===3 && state.projectDetail>=0){
+    if(dir==="up"){ state.pdScrollY=Math.max(0,state.pdScrollY-18); const b=document.getElementById("pd-scroll-body"); if(b) b.style.transform=`translateY(${-state.pdScrollY}px)`; beep(600,0.02,"square",0.02); return; }
+    if(dir==="down"){ state.pdScrollY+=18; const b=document.getElementById("pd-scroll-body"); if(b) b.style.transform=`translateY(${-state.pdScrollY}px)`; beep(600,0.02,"square",0.02); return; }
+  }
   if(dir==="left" || dir==="right"){
     wipe();
     setTimeout(()=>{
@@ -754,18 +889,84 @@ function move(dir){
 }
 function pressA(){
   if(state.inGame) return tetris.input("a");
-  if(state.section===3 && state.projectDetail<0){ state.projectDetail=state.projectIdx; beep(880,0.06,"square",0.06); render(); return; }
-  if(state.section===4){
-    const resume = `ALEX CHEN\nFull-Stack Developer & Creative Technologist\nalex@pixelstack.io\n\nEXPERIENCE\n  Senior Engineer, independent (2022–)\n  Engineer, Pixelstack Labs (2020–2022)\n\nPROJECTS\n  Pixelforge, Rustboard, Neuralens, Loopcast\n\nSTACK\n  React, Rust, Python, TypeScript, WebGPU, TFLite`;
-    const blob = new Blob([resume],{type:"text/plain"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a"); a.href=url; a.download="alex-chen-resume.txt"; a.click();
-    setTimeout(()=>URL.revokeObjectURL(url),1000);
-    beep(880,0.1,"square",0.06);
+  if(state.section===3 && state.projectDetail<0){ state.projectDetail=state.projectIdx; state.pdScrollY=0; beep(880,0.06,"square",0.06); render(); return; }
+  if(state.section===5){
+    window.open("https://linkedin.com/in/arahe","_blank"); beep(880,0.06,"square",0.06);
     return;
   }
+  if(state.section===1){ downloadResumePDF(); return; }
   if(state.section===0){ state.section=1; state.projectDetail=-1; wipe(); setTimeout(render,100); beep(880,0.08,"square",0.06); return; }
   beep(880,0.06,"square",0.06);
+}
+
+function downloadResumePDF(){
+  const resumeHTML = `
+    <div style="font-family:Arial,sans-serif;padding:40px;line-height:1.5;color:#333;font-size:11px;word-wrap:break-word;overflow-wrap:break-word;">
+    <style>ul{page-break-inside:avoid} p+ul{page-break-inside:avoid} .proj-block{page-break-inside:avoid}</style>
+      <h1 style="text-align:center;margin:0 0 4px;font-size:26px;">ABDUR RAHEEM IMAMI</h1>
+      <p style="text-align:center;margin:0 0 20px;color:#666;font-size:10px;">Mechatronics & Automation (2024–2028) • Year 2, Sem 4 • VIT Chennai</p>
+      <p style="text-align:center;margin:0 0 20px;color:#666;font-size:10px;">CGPA 8.82 | Dept. Rank 4 (AY 2024–25) | Sem 1 GPA: 9.56</p>
+
+      <h2 style="border-bottom:2px solid #333;padding-bottom:6px;font-size:13px;margin:18px 0 10px;">SUMMARY</h2>
+      <p style="margin:0 0 10px;">Mechatronics undergraduate (CGPA 8.82, Dept. Rank 4) and co-founder of DPIIT-recognized robotics startup. Builds complete systems: from-scratch CUDA inference engines (MoE architecture for 35B parameter models), humanoid robots (17-DOF bipedal with distributed control), embedded firmware & sensor fusion. Currently leading V-NEST incubated Sentrix Robotics (26th startup) and co-founded Team Genesis—VIT's humanoid robotics team (16th STT on campus, 1 year old).</p>
+
+      <h2 style="border-bottom:2px solid #333;padding-bottom:6px;font-size:13px;margin:15px 0 10px;">EDUCATION</h2>
+      <p style="margin:0 0 4px;"><strong>VIT Chennai</strong> (2024–2028)</p>
+      <p style="margin:0 0 8px;"><strong>B.Tech in Mechatronics and Automation Engineering</strong><br/>CGPA 8.82 | Dept. Rank 4 (AY 2024–25) | Sem 1 GPA: 9.56 | Year 2, Semester 4<br/>Coursework: Embedded Systems, Control Systems, Machine Learning, DSP, Robotics</p>
+      <p style="margin:0 0 4px;"><strong>NMS-DPS Bahrain</strong> (2022) — CBSE Grade 12 · 91.6%</p>
+
+      <h2 style="border-bottom:2px solid #333;padding-bottom:6px;font-size:13px;margin:15px 0 10px;">EXPERIENCE</h2>
+      <p style="margin:0 0 6px;"><strong>Co-Founder & CTO — Sentrix Robotics Pvt. Ltd.</strong> (2025–Present)</p>
+      <ul style="margin:4px 0 8px;padding-left:20px;"><li>V-NEST Incubated startup (26th company admitted to program), DPIIT Recognized</li><li>Own complete technical roadmap: hardware architecture, firmware stack, software infrastructure across all active product lines</li><li>Represented Sentrix at Google AI Day for Startups 2025 (IITM Research Park) and SolidWorks Startup Summit (StartupTN, IIT Madras)</li><li>Shortlisted for EUREKA! Zonals (E-Cell IIT Bombay), APF, Campus Fund, and Yukti acceleration programs</li><li>Speaker at IEEECS BuildersHut—shared technical founding experience with student engineering audience</li></ul>
+
+      <p style="margin:0 0 6px;"><strong>Co-Founder & Head of Operations — Team Genesis</strong> (2025–Present)</p>
+      <ul style="margin:4px 0 8px;padding-left:20px;"><li>Co-founded VIT Chennai's first dedicated humanoid robotics team; grew to 16th STT on campus within 1 year of founding</li><li>Directing KP17 development: 17-DOF bipedal humanoid with pod-based distributed control architecture, full onboard computation</li><li>Leading GloveXR teleoperation glove program—IMU-based hand motion capture (optical/magnetic-field-free)</li><li>Designed and implemented hierarchical management sub-stack modeled on Market-Based Management (MBM) principles</li><li>Restructured internal accountability and decision-making frameworks across 16-person team</li></ul>
+
+      <p style="margin:0 0 6px;"><strong>Management Member — IEEE Computer Society, VIT Chennai</strong> (Jul 2025–Present)</p>
+      <ul style="margin:4px 0 8px;padding-left:20px;"><li>Core organizational member; contributed to event planning, community initiatives, technical programming</li><li>Key organizer for BuildersHut hardware hackathon; promoted embedded systems education on campus</li></ul>
+
+      <h2 style="border-bottom:2px solid #333;padding-bottom:6px;font-size:13px;margin:15px 0 10px;">PROJECTS (6 TOTAL)</h2>
+      <p style="margin:0 0 6px;"><strong>BREAD v2 — Custom CUDA MoE Inference Engine</strong> (2026–Present)</p>
+      <ul style="margin:4px 0 8px;padding-left:20px;"><li>From-scratch CUDA port of danveloper's flash-moe (originally macOS/Metal only) to Windows/CUDA. Target: run Qwen3.5-35B-A3B (35B params) on RTX 4060 (8GB VRAM)</li><li>3-tier weight streaming: VRAM → pinned RAM → NVMe SSD with 18-slot LRU expert cache</li><li>Custom GGUF parser, CPU dequantization (Q4_K/Q6_K verified vs. ggml-quants.c), async cudaMemcpyAsync prefetch</li><li>PCIe x8 bandwidth profiling (~8-12 GB/s practical); NVMe optimal parallel reads (K=4)</li></ul>
+
+      <p style="margin:0 0 6px;"><strong>MoE KV Routing — Sparse Attention Dashboard</strong> (2026–Present)</p>
+      <ul style="margin:4px 0 8px;padding-left:20px;"><li>Real-time React + WebSocket dashboard: sparse KV cache routing layer for 262k token context</li><li>Per-head routing decisions, recall heatmaps vs. actual attention mass, bandwidth savings visualization</li><li>Targets 8-10x KV bandwidth compression; automatic fallback to dense Circular KV on accuracy drop</li></ul>
+
+      <p style="margin:0 0 6px;"><strong>GloveXR — Wearable IMU Motion Capture Glove</strong> (2025–Present)</p>
+      <ul style="margin:4px 0 8px;padding-left:20px;"><li>Wearable hand motion capture using multiple LSM6DSO32 6-DoF IMUs (accel + gyro)</li><li>Custom Mahony-style sensor fusion + kinematic chain math for per-finger joint angle estimation</li><li>Optical-field-free and magnetic-field-free design (works near robot actuators/motors)</li><li>Java Processing live 3D skeletal visualization; joint bounds as drift correction mechanism</li></ul>
+
+      <p style="margin:0 0 6px;"><strong>Atelier — Terminal Browser (Rust)</strong> (2025)</p>
+      <ul style="margin:4px 0 8px;padding-left:20px;"><li>~361 LOC Rust: Headless Chrome captures PNG → downscale to terminal → Ratatui display</li><li>Sixel graphics + 256-color ANSI ASCII art fallback; trait-based backend swapping (HTTP/headless)</li><li>Async Tokio event loop (100ms non-blocking poll), YouTube detection module for future mpv integration</li></ul>
+
+      <p style="margin:0 0 6px;"><strong>Railway Infrastructure Inspection Hardware — SIH 2025</strong> (2025)</p>
+      <ul style="margin:4px 0 8px;padding-left:20px;"><li>Smart India Hackathon 2025 (Hardware PS 25020): Clip-on units for operational train monitoring</li><li>Passive IMU vibration detection, on-board FFT/Welch edge processing</li><li>KAVACH RFID integration for geo-tagging in tunnels, 5G real-time alerting</li><li>70% CAPEX, 67% OPEX reduction vs. Track Recording Cars; TM/IM/448 + Gati Shakti compliance</li></ul>
+
+      <p style="margin:0 0 6px;"><strong>KP17 — 17-DOF Bipedal Humanoid Robot</strong> (2024–Present)</p>
+      <ul style="margin:4px 0 8px;padding-left:20px;"><li>Pod-based distributed control architecture with full onboard computation</li><li>RoboCup framework, SolidWorks CAD design, kinematic chain optimization</li><li>Integration with GloveXR for teleoperation and sensor feedback systems</li></ul>
+
+      <h2 style="border-bottom:2px solid #333;padding-bottom:6px;font-size:13px;margin:15px 0 10px;">TECHNICAL SKILLS</h2>
+      <p style="margin:0;"><strong>Systems & Inference:</strong> CUDA · GPU Programming · MoE Architecture · GGUF · Q4_K/Q6_K Quantization · llama.cpp · Speculative Decoding · Tiered Memory · Inference Optimization</p>
+      <p style="margin:6px 0;"><strong>Languages:</strong> C/C++ · Rust · Python · Embedded C · Java · CUDA C++</p>
+      <p style="margin:6px 0;"><strong>Embedded & Hardware:</strong> ESP32 · ESP32-C6 · LSM6DSO32 · IMU/Sensor Fusion · SolidWorks · IoT Protocols · OLED/TFT Drivers · Relay Control</p>
+      <p style="margin:6px 0;"><strong>Robotics:</strong> Humanoid Architecture · Bipedal Control · Teleoperation · Kinematic Chains · RoboCup Framework</p>
+      <p style="margin:6px 0;"><strong>Frontend & Visualization:</strong> React · Ratatui · HTML/CSS · Sixel Graphics · Real-time Dashboards</p>
+      <p style="margin:6px 0;"><strong>Backend & Tools:</strong> Node.js · WebSocket · UDP · MCP (Model Context Protocol) · Git · MSVC · CMake · Windows</p>
+
+      <h2 style="border-bottom:2px solid #333;padding-bottom:6px;font-size:13px;margin:15px 0 10px;">HONORS & RECOGNITION</h2>
+      <ul style="margin:6px 0;padding-left:20px;"><li><strong>Dept. Rank 4</strong> — Mechatronics & Automation, AY 2024–25, VIT Chennai</li><li><strong>Selected</strong> — Smart India Hackathon 2025, Hardware PS 25020 (representing VIT Chennai)</li><li><strong>Shortlisted</strong> — EUREKA! Zonals, E-Cell IIT Bombay (2025)</li><li><strong>Represented</strong> — Google AI Day for Startups 2025, IITM Research Park</li><li><strong>Finalist</strong> — IEEECS HackHub '25 (4th place)</li><li><strong>Fellow</strong> — CrftHQ (India's largest Build-in-Public founder network)</li><li><strong>Speaker</strong> — IEEECS BuildersHut (technical founding experience)</li></ul>
+    </div>
+  `;
+
+  const opt = {
+    margin: 10,
+    filename: 'Abdur-Raheem-Imami-Resume.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+  };
+
+  html2pdf().set(opt).from(resumeHTML).save();
+  beep(880,0.1,"square",0.06);
 }
 function pressB(){
   if(state.inGame) return tetris.input("b");
